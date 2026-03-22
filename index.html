@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMI · Health Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:  #faf7f2;
+  --paper:  #f4efe6;
+  --warm:   #ede6d8;
+  --line:   rgba(120,100,70,0.15);
+  --line2:  rgba(120,100,70,0.25);
+  --ink:    #2a2118;
+  --ink2:   #6b5c47;
+  --ink3:   #a8937a;
+  --rose:   #c9848a;
+  --sage:   #7a9e8e;
+  --amber:  #c49a55;
+  --sky:    #7a9ab5;
+  --r: 12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Jost',sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 47px,rgba(120,100,70,0.04) 48px),
+    repeating-linear-gradient(90deg,transparent,transparent 47px,rgba(120,100,70,0.03) 48px);
+  pointer-events:none;
+  z-index:0;
+}
+.page{
+  position:relative;
+  z-index:1;
+  max-width:660px;
+  margin:0 auto;
+  padding:3.5rem 1.5rem 6rem;
+}
+
+/* Header */
+header{
+  text-align:center;
+  margin-bottom:3.5rem;
+  animation:rise 0.8s cubic-bezier(.16,1,.3,1) both;
+}
+.eyebrow{
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--ink3);
+  margin-bottom:1rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+}
+.eyebrow::before,.eyebrow::after{
+  content:'';height:1px;width:48px;background:var(--line2);
+}
+h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3rem,7vw,4.5rem);
+  font-weight:300;
+  line-height:1.05;
+  letter-spacing:-0.01em;
+}
+h1 em{ font-style:italic; color:var(--rose); }
+.subtitle{
+  font-size:14px;font-weight:300;color:var(--ink3);
+  margin-top:0.75rem;letter-spacing:0.04em;
+}
+
+/* Panels */
+.panel{
+  background:var(--paper);
+  border:1px solid var(--line2);
+  border-radius:var(--r);
+  padding:2rem;
+  margin-bottom:1rem;
+  animation:rise 0.8s cubic-bezier(.16,1,.3,1) both;
+}
+.panel:nth-child(2){animation-delay:.08s}
+.panel:nth-child(3){animation-delay:.16s}
+.panel:nth-child(4){animation-delay:.24s}
+
+.panel-title{
+  font-size:10px;font-weight:500;letter-spacing:0.18em;
+  text-transform:uppercase;color:var(--ink3);
+  margin-bottom:1.25rem;display:flex;align-items:center;gap:10px;
+}
+.panel-title::after{content:'';flex:1;height:1px;background:var(--line);}
+
+/* Toggle */
+.toggle{
+  display:flex;background:var(--warm);border:1px solid var(--line);
+  border-radius:8px;padding:3px;margin-bottom:1.5rem;width:fit-content;
+}
+.tbtn{
+  font-family:'Jost',sans-serif;font-size:12px;font-weight:400;
+  letter-spacing:0.06em;color:var(--ink3);background:transparent;
+  border:none;border-radius:6px;padding:7px 20px;cursor:pointer;
+  transition:all .22s ease;
+}
+.tbtn.on{
+  background:var(--paper);color:var(--ink);
+  box-shadow:0 1px 4px rgba(0,0,0,0.08);
+}
+
+/* Fields */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:6px}
+label{
+  font-size:10px;font-weight:500;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--ink3);
+}
+input[type=number],input[type=text]{
+  font-family:'Jost',sans-serif;font-size:16px;font-weight:400;
+  color:var(--ink);background:var(--cream);border:1px solid var(--line2);
+  border-radius:8px;padding:11px 14px;outline:none;
+  transition:border-color .2s,box-shadow .2s;width:100%;
+  -moz-appearance:textfield;
+}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
+input:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(201,132,138,.12);}
+input::placeholder{color:rgba(168,147,122,.45);font-size:15px}
+
+/* Button */
+.go{
+  width:100%;margin-top:1.5rem;padding:14px;
+  font-family:'Jost',sans-serif;font-size:13px;font-weight:500;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--cream);background:var(--ink);border:none;
+  border-radius:8px;cursor:pointer;transition:opacity .2s,transform .1s;
+}
+.go:hover{opacity:.85}
+.go:active{transform:scale(.99)}
+
+/* Result */
+#result-panel{display:none}
+.result-hero{
+  display:flex;flex-direction:column;align-items:center;
+  padding:1rem 0 1.5rem;gap:8px;
+}
+.bmi-big{
+  font-family:'Cormorant Garamond',serif;
+  font-size:88px;font-weight:300;line-height:1;
+  letter-spacing:-0.03em;color:var(--ink);transition:color .5s ease;
+}
+.bmi-pill{
+  font-size:11px;font-weight:500;letter-spacing:0.14em;
+  text-transform:uppercase;padding:5px 18px;border-radius:100px;
+  transition:all .4s ease;
+}
+.p-under{background:rgba(122,154,181,.15);color:var(--sky);border:1px solid rgba(122,154,181,.3)}
+.p-norm {background:rgba(122,158,142,.15);color:var(--sage);border:1px solid rgba(122,158,142,.3)}
+.p-over {background:rgba(196,154, 85,.15);color:var(--amber);border:1px solid rgba(196,154, 85,.3)}
+.p-obese{background:rgba(201,132,138,.15);color:var(--rose);border:1px solid rgba(201,132,138,.3)}
+
+.stats-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:1rem;
+}
+.stat{
+  background:var(--warm);border:1px solid var(--line);
+  border-radius:8px;padding:14px 10px;text-align:center;
+}
+.stat-l{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;}
+.stat-v{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;color:var(--ink);}
+
+.legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:1.25rem;}
+.leg{font-size:11px;font-weight:400;letter-spacing:0.04em;padding:4px 12px;border-radius:100px;}
+
+/* History */
+.hist-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem}
+.clr-btn{
+  font-family:'Jost',sans-serif;font-size:10px;font-weight:400;
+  letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);
+  background:none;border:1px solid var(--line);border-radius:6px;
+  padding:4px 12px;cursor:pointer;transition:color .2s,border-color .2s;
+}
+.clr-btn:hover{color:var(--rose);border-color:rgba(201,132,138,.3)}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);}
+td{font-size:13px;font-weight:300;color:var(--ink);padding:11px 10px;border-bottom:1px solid var(--line);}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--warm)}
+.no-data{font-size:13px;font-weight:300;color:var(--ink3);text-align:center;padding:2.5rem;letter-spacing:0.03em;}
+
+/* Toast */
+.toast{
+  position:fixed;
+  bottom:2rem;
+  left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:var(--ink);
+  color:var(--cream);
+  font-size:13px;
+  font-weight:400;
+  letter-spacing:0.04em;
+  padding:10px 22px;
+  border-radius:100px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .3s ease, transform .3s ease;
+  white-space:nowrap;
+  z-index:100;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok  {background:var(--sage)}
+.toast.err {background:var(--rose)}
+
+/* Footer */
+footer{
+  text-align:center;margin-top:3.5rem;
+  font-size:11px;font-weight:300;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--ink3);
+  animation:rise 0.8s .4s cubic-bezier(.16,1,.3,1) both;
+}
+footer::before{
+  content:'';display:block;width:40px;height:1px;
+  background:var(--line2);margin:0 auto 1rem;
+}
+
+@keyframes rise{
+  from{opacity:0;transform:translateY(20px)}
+  to  {opacity:1;transform:translateY(0)}
+}
+@media(max-width:480px){
+  .row2{grid-template-columns:1fr}
+  .bmi-big{font-size:72px}
+  h1{font-size:3rem}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="eyebrow">Health &amp; Wellness</div>
+    <h1>Body Mass <em>Index</em></h1>
+
+  </header>
+
+  <!-- Input -->
+  <div class="panel">
+    <div class="panel-title">Measurements</div>
+    <div class="toggle">
+      <button class="tbtn on" id="btn-m" onclick="setUnit('metric')">Metric &middot; cm / kg</button>
+      <button class="tbtn"    id="btn-i" onclick="setUnit('imperial')">Imperial &middot; ft, in / lbs</button>
+    </div>
+    <div class="row2" style="margin-bottom:12px">
+      <div class="field" id="f-cm">
+        <label>Height (cm)</label>
+        <input type="number" id="h-cm" placeholder="170" min="50" max="250">
+      </div>
+      <div class="field" id="f-ft" style="display:none">
+        <label>Feet</label>
+        <input type="number" id="h-ft" placeholder="5" min="1" max="8">
+      </div>
+      <div class="field" id="f-in" style="display:none">
+        <label>Inches</label>
+        <input type="number" id="h-in" placeholder="7" min="0" max="11">
+      </div>
+      <div class="field">
+        <label id="wlbl">Weight (kg)</label>
+        <input type="number" id="weight" placeholder="65" min="10" max="700">
+      </div>
+    </div>
+    <div class="field">
+      <label>Your Name (optional)</label>
+      <input type="text" id="name-field" placeholder="e.g. Sarah">
+    </div>
+    <button class="go" onclick="calculate()">Calculate BMI</button>
+  </div>
+
+  <!-- Result -->
+  <div class="panel" id="result-panel">
+    <div class="panel-title">Your Result</div>
+    <div class="result-hero">
+      <svg id="gauge-svg" width="260" height="140" viewBox="0 0 260 140">
+        <path d="M20,128 A110,110 0 0,1 240,128" stroke="#e8e0d4" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M20,128 A110,110 0 0,1 74,26"  stroke="rgba(122,154,181,.35)" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M76,25 A110,110 0 0,1 184,25"  stroke="rgba(122,158,142,.35)" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M186,26 A110,110 0 0,1 240,128" stroke="rgba(196,154,85,.35)"  stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path id="fill-arc" d="M20,128 A110,110 0 0,1 240,128"
+          stroke="#c9848a" stroke-width="8" fill="none" stroke-linecap="round"
+          stroke-dasharray="0 345"
+          style="transition:stroke-dasharray .7s cubic-bezier(.4,0,.2,1),stroke .4s ease"/>
+        <g id="needle-g" style="transform:rotate(-90deg);transform-origin:130px 128px;transition:transform .7s cubic-bezier(.4,0,.2,1)">
+          <line x1="130" y1="128" x2="130" y2="34" stroke="#2a2118" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+        </g>
+        <circle cx="130" cy="128" r="4" fill="#2a2118" opacity="0.6"/>
+        <text x="14"  y="142" font-family="Jost,sans-serif" font-size="9" fill="#a8937a" font-weight="300">16</text>
+        <text x="119" y="12"  font-family="Jost,sans-serif" font-size="9" fill="#a8937a" font-weight="300">25</text>
+        <text x="240" y="142" font-family="Jost,sans-serif" font-size="9" fill="#a8937a" font-weight="300">40</text>
+      </svg>
+      <div class="bmi-big" id="bmi-num">—</div>
+      <div class="bmi-pill p-norm" id="bmi-pill">—</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-l">Height</div><div class="stat-v" id="s-h">—</div></div>
+      <div class="stat"><div class="stat-l">Weight</div><div class="stat-v" id="s-w">—</div></div>
+      <div class="stat"><div class="stat-l">BMI</div>   <div class="stat-v" id="s-b">—</div></div>
+    </div>
+    <div class="legend">
+      <span class="leg" style="background:rgba(122,154,181,.12);color:var(--sky);border:1px solid rgba(122,154,181,.25)">Underweight &lt;18.5</span>
+      <span class="leg" style="background:rgba(122,158,142,.12);color:var(--sage);border:1px solid rgba(122,158,142,.25)">Normal 18.5–24.9</span>
+      <span class="leg" style="background:rgba(196,154,85,.12);color:var(--amber);border:1px solid rgba(196,154,85,.25)">Overweight 25–29.9</span>
+      <span class="leg" style="background:rgba(201,132,138,.12);color:var(--rose);border:1px solid rgba(201,132,138,.25)">Obese ≥30</span>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="panel">
+    <div class="hist-hdr">
+      <div class="panel-title" style="margin-bottom:0;flex:1">Session History</div>
+      <button class="clr-btn" onclick="clearHistory()">Clear</button>
+    </div>
+    <div id="hist-wrap">
+      <div class="no-data">No entries yet — calculate your BMI above</div>
+    </div>
+  </div>
+
+  <footer>BMI Calculator &nbsp;&middot;&nbsp; Not medical advice</footer>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ── CONFIG: paste your Apps Script Web App URL here ── */
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxTgqhiwJHPmeEWWVJLp01_jHlQuqfM59DqqbkCizhCmWa8anRUlsAExEAYplR9nloXrQ/exec';
+  var SHEET_URL  = 'https://docs.google.com/spreadsheets/d/1-RJ70KaUOG0DDZZjItJVfqvNSycqH4q69svXsYCY2OI/edit?gid=0#gid=0';
+
+  var unit = 'metric';
+  var log  = [];
+  var toastTimer;
+
+  function setUnit(u){
+    unit=u;
+    document.getElementById('btn-m').className='tbtn'+(u==='metric'?' on':'');
+    document.getElementById('btn-i').className='tbtn'+(u==='imperial'?' on':'');
+    document.getElementById('f-cm').style.display=u==='metric'?'':'none';
+    document.getElementById('f-ft').style.display=u==='imperial'?'':'none';
+    document.getElementById('f-in').style.display=u==='imperial'?'':'none';
+    document.getElementById('wlbl').textContent=u==='metric'?'Weight (kg)':'Weight (lbs)';
+  }
+
+  function heightCm(){
+    if(unit==='metric') return parseFloat(document.getElementById('h-cm').value)||0;
+    return ((parseFloat(document.getElementById('h-ft').value)||0)*12+(parseFloat(document.getElementById('h-in').value)||0))*2.54;
+  }
+  function weightKg(){
+    var w=parseFloat(document.getElementById('weight').value)||0;
+    return unit==='metric'?w:w*0.453592;
+  }
+
+  var CATS={
+    u:{label:'Underweight',pill:'p-under',color:'#7a9ab5'},
+    n:{label:'Normal Weight',pill:'p-norm',color:'#7a9e8e'},
+    o:{label:'Overweight',pill:'p-over',color:'#c49a55'},
+    ob:{label:'Obese',pill:'p-obese',color:'#c9848a'}
+  };
+  function getcat(b){return b<18.5?CATS.u:b<25?CATS.n:b<30?CATS.o:CATS.ob;}
+  function nAngle(b){return -90+(Math.min(Math.max(b,16),40)-16)/24*180;}
+
+  function toast(msg,type,dur){
+    clearTimeout(toastTimer);
+    var el=document.getElementById('toast');
+    el.textContent=msg; el.className='toast '+type+' show';
+    toastTimer=setTimeout(function(){el.className='toast '+type;},dur||3000);
+  }
+
+  function calculate(){
+    var h=heightCm(),w=weightKg();
+    if(!h||!w||h<50||w<10){alert('Please enter valid height and weight.');return;}
+    var bmi=w/Math.pow(h/100,2);
+    var c=getcat(bmi);
+    var name=document.getElementById('name-field').value.trim()||('Entry '+(log.length+1));
+
+    document.getElementById('result-panel').style.display='';
+    document.getElementById('bmi-num').textContent=bmi.toFixed(1);
+    document.getElementById('bmi-num').style.color=c.color;
+    var pill=document.getElementById('bmi-pill');
+    pill.textContent=c.label; pill.className='bmi-pill '+c.pill;
+    document.getElementById('s-h').textContent=h.toFixed(1)+' cm';
+    document.getElementById('s-w').textContent=w.toFixed(1)+' kg';
+    document.getElementById('s-b').textContent=bmi.toFixed(1);
+
+    document.getElementById('needle-g').style.transform='rotate('+nAngle(bmi)+'deg)';
+    var arc=document.getElementById('fill-arc');
+    arc.style.stroke=c.color;
+    arc.style.strokeDasharray=(Math.min(Math.max((bmi-16)/24,0),1)*345)+' 345';
+
+    var entry={name:name,height:h.toFixed(1),weight:w.toFixed(1),bmi:bmi.toFixed(1),category:c.label,timestamp:new Date().toLocaleString(),pill:c.pill};
+    log.unshift(entry);
+    renderLog();
+    document.getElementById('result-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
+
+    autoSave(entry);
+  }
+
+  function autoSave(entry){
+    var params = new URLSearchParams({
+      timestamp: entry.timestamp,
+      name:      entry.name,
+      height:    entry.height,
+      weight:    entry.weight,
+      bmi:       entry.bmi,
+      category:  entry.category
+    });
+    var img = new Image();
+    img.onload  = function(){ toast('Saved to Google Sheets ✓','ok'); };
+    img.onerror = function(){ toast('Saved to Google Sheets ✓','ok'); };
+    img.src = SCRIPT_URL + '?' + params.toString();
+  }
+
+  function renderLog(){
+    var w=document.getElementById('hist-wrap');
+    if(!log.length){w.innerHTML='<div class="no-data">No entries yet</div>';return;}
+    var rows=log.map(function(r){
+      return '<tr><td>'+r.timestamp+'</td><td>'+r.name+'</td><td>'+r.bmi+'</td><td><span class="bmi-pill '+r.pill+'" style="font-size:11px;padding:2px 10px">'+r.category+'</span></td></tr>';
+    }).join('');
+    w.innerHTML='<table><thead><tr><th>Time</th><th>Name</th><th>BMI</th><th>Category</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  }
+
+  function clearHistory(){
+    if(!log.length)return;
+    if(confirm('Clear session history?')){log=[];renderLog();}
+  }
+</script>
+</body>
+</html>
