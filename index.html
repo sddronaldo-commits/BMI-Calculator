@@ -416,8 +416,8 @@ footer::before{
   function autoSave(entry){
     if(!SCRIPT_URL||SCRIPT_URL==='YOUR_APPS_SCRIPT_WEB_APP_URL') return;
     var payload={sheetUrl:SHEET_URL,timestamp:entry.timestamp,name:entry.name,height:entry.height,weight:entry.weight,bmi:entry.bmi,category:entry.category};
-    fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'}})
-      .then(function(r){return r.text();})
+    fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload),headers:{'Content-Type':'text/plain'}})
+      
       .then(function(){toast('Saved to Google Sheets','ok');})
       .catch(function(){toast('Could not save to sheet','err');});
   }
